@@ -1,15 +1,30 @@
-import { IBlock } from './State';
+import { Action } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+import { IBlock, IGameState } from './State';
 
 
-export interface IAction<TPayload = undefined> {
-    type: string;
+export interface IAction<TType = string, TPayload = undefined> extends Action<TType> {
+    type: TType;
     payload: TPayload;
 }
 
-export interface IDecrementAction extends IAction<IBlock> {
-    type: 'DECREMENT';
-}
+export const DECREMENT = 'DECREMENT';
+export type DecrementAction = IAction<typeof DECREMENT, IBlock>;
 
 export type ActionUnion = (
-    | IDecrementAction
+    | DecrementAction
 );
+
+export type GameThunkAction = ThunkAction<unknown, IGameState, unknown, ActionUnion>;
+
+export const decrement = (block: IBlock): DecrementAction => ({
+    type: DECREMENT,
+    payload: block,
+});
+
+export const decrementRandom = (): GameThunkAction => (dispatch, getState) => {
+    const blocks = getState().blocks;
+    const y = Math.floor(Math.random() * blocks.length);
+    const x = Math.floor(Math.random() * blocks[y].length);
+    dispatch(decrement(blocks[y][x]));
+};

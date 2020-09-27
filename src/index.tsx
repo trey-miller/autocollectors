@@ -1,19 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import thunkMiddleware from 'redux-thunk';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { applyMiddleware, compose, createStore } from 'redux';
 import { rootReducer } from './game/Reducers';
 import { IGameState } from './game/State';
 import { ActionUnion } from './game/Actions';
 
+const composeEnhancers =
+  typeof window === 'object' &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+    }) : compose;
 
+const enhancer = composeEnhancers(
+  applyMiddleware(
+    thunkMiddleware,
+  ),
+  // other store enhancers if any
+);
 
 const store = createStore<IGameState, ActionUnion, unknown, unknown>(
-  rootReducer,  
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+  rootReducer,
+  enhancer,
 );
 
 

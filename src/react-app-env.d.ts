@@ -1,5 +1,5 @@
 /// <reference types="react-scripts" />
 
 interface Window {
-    __REDUX_DEVTOOLS_EXTENSION__: Function | undefined;
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: Function | undefined;
 }

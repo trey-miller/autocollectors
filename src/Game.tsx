@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styles from './Game.module.scss';
 import { IBlock, IBlocks, IGameState } from './game/State';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStep } from './game/hooks/useStep';
+import { decrement, decrementRandom } from './game/Actions';
+import { createKey } from './game/util';
 
 
 interface IBlockProps {
@@ -14,36 +16,28 @@ export function Game(): JSX.Element {
     const blocks = useSelector<IGameState, IBlocks>(state => state.blocks);
     const stuff = useSelector<IGameState, number>(state => state.stuff);
     const dispatch = useDispatch();
-    const updated = useRef({ total: 0, totalMs: 0, lastTime: 0, off: 0, offAverage: 0 });
 
     useStep(delta => {
-        const y = Math.floor(Math.random() * blocks.length);
-        const x = Math.floor(Math.random() * blocks[0].length);
-        dispatch({ type: 'DECREMENT', payload: blocks[y][x] });
-
-        // debug logging for sanity (delete the below some day)
-        const now = Date.now();
-        updated.current.total++;
-        updated.current.totalMs += now - (updated.current.lastTime || now - delta);
-        updated.current.lastTime = now;
-        updated.current.off = updated.current.total * 1000 / updated.current.totalMs;
-        console.log('auto decrementing block at ', x, y, 'delta: ', delta, 'time: ', now, updated.current);
-
+        dispatch(decrementRandom());
     }, 1000, 0);
 
     const onBlockClick = useCallback((block: IBlock) => {
         console.log('clicked block', block);
-        dispatch({ type: 'DECREMENT', payload: block });
+        dispatch(decrement(block));
     }, [blocks]);
 
     return (
         <div className={styles.root}>
             <p>Collected stuff: {stuff}</p>
             <div>
-                {blocks.map(row => (
-                    <div className={styles.row}>
+                {blocks.map((row, i) => (
+                    <div className={styles.row} key={i}>
                         {row.map(block => (
-                            <Block block={block} onClick={() => onBlockClick(block)} />
+                            <Block
+                                key={createKey(block.x, block.y, blocks.length)}
+                                block={block}
+                                onClick={() => onBlockClick(block)}
+                            />
                         ))}
                     </div>
                 ))}

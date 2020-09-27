@@ -14,10 +14,11 @@ export interface IGameState {
     stuff: number;
 }
 
+const SIZE = 12;
 
 export const createDefaultState = (): IGameState => ({
-    blocks: range(0, 20)
-        .map(y => range(0, 20)
+    blocks: range(0, SIZE)
+        .map(y => range(0, SIZE)
             .map(x => ({ x, y, stuff: 10 }))),
     stuff: 0,
 });
