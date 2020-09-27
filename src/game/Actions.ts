@@ -8,23 +8,23 @@ export interface IAction<TType = string, TPayload = undefined> extends Action<TT
     payload: TPayload;
 }
 
-export const DECREMENT = 'DECREMENT';
-export type DecrementAction = IAction<typeof DECREMENT, IBlock>;
+export const COLLECT = 'COLLECT';
+export type CollectAction = IAction<typeof COLLECT, IBlock>;
 
 export type ActionUnion = (
-    | DecrementAction
+    | CollectAction
 );
 
 export type GameThunkAction = ThunkAction<unknown, IGameState, unknown, ActionUnion>;
 
-export const decrement = (block: IBlock): DecrementAction => ({
-    type: DECREMENT,
+export const collect = (block: IBlock): CollectAction => ({
+    type: COLLECT,
     payload: block,
 });
 
-export const decrementRandom = (): GameThunkAction => (dispatch, getState) => {
+export const collectRandom = (): GameThunkAction => (dispatch, getState) => {
     const blocks = getState().blocks;
     const y = Math.floor(Math.random() * blocks.length);
     const x = Math.floor(Math.random() * blocks[y].length);
-    dispatch(decrement(blocks[y][x]));
+    dispatch(collect(blocks[y][x]));
 };

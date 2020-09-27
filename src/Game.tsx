@@ -3,13 +3,12 @@ import styles from './Game.module.scss';
 import { IBlock, IBlocks, IGameState } from './game/State';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStep } from './game/hooks/useStep';
-import { decrement, decrementRandom } from './game/Actions';
+import { collect, collectRandom } from './game/Actions';
 import { createKey } from './game/util';
 
 
 interface IBlockProps {
     block: IBlock;
-    onClick?: () => void;
 }
 
 export function Game(): JSX.Element {
@@ -18,13 +17,8 @@ export function Game(): JSX.Element {
     const dispatch = useDispatch();
 
     useStep(delta => {
-        dispatch(decrementRandom());
+        dispatch(collectRandom());
     }, 1000, 0);
-
-    const onBlockClick = useCallback((block: IBlock) => {
-        console.log('clicked block', block);
-        dispatch(decrement(block));
-    }, [blocks]);
 
     return (
         <div className={styles.root}>
@@ -36,7 +30,6 @@ export function Game(): JSX.Element {
                             <Block
                                 key={createKey(block.x, block.y, blocks.length)}
                                 block={block}
-                                onClick={() => onBlockClick(block)}
                             />
                         ))}
                     </div>
@@ -46,8 +39,10 @@ export function Game(): JSX.Element {
     );
 }
 
-function Block({ block: { stuff }, onClick }: IBlockProps): JSX.Element {
-    const size = useMemo(() => Math.floor(stuff * 100 / 10) + '%', [stuff]);
+function Block({ block }: IBlockProps): JSX.Element {
+    const dispatch = useDispatch();
+    const onClick = useCallback(() => dispatch(collect(block)), [dispatch, block]);
+    const size = useMemo(() => Math.floor(block.stuff * 100 / 10) + '%', [block.stuff]);
     return (
         <div className={styles.block} onClick={onClick}>
             <div

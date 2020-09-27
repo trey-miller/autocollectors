@@ -1,4 +1,4 @@
-import { ActionUnion, DECREMENT } from './Actions';
+import { ActionUnion, COLLECT } from './Actions';
 import { createDefaultState, IGameState } from './State';
 
 
@@ -8,8 +8,9 @@ export function rootReducer(state: IGameState = createDefaultState(), action?: A
     }
 
     switch (action.type) {
-        case DECREMENT:
-            const block = action.payload;
+        case COLLECT:
+            const { x, y } = action.payload;
+            const block = state.blocks[y][x];
             if (block.stuff <= 0) {
                 return state;
             }
