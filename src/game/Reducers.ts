@@ -24,6 +24,7 @@ export function rootReducer(state: IGameState = createDefaultState(), action?: A
                         ]
                         : column),
                 ],
+                stuff: state.stuff + 1,
             };
         default:
             return state;
