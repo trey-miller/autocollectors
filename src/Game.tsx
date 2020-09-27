@@ -1,64 +1,38 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { range } from 'lodash';
+import React, { useCallback, useMemo } from 'react';
 import styles from './Game.module.scss';
+import { IBlock, IBlocks, IGameState } from './game/State';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 interface IBlockProps {
-    id: string;
-    stuff: number;
+    block: IBlock;
     onClick?: () => void;
 }
 
-function createInitialBlockProps(): IBlockProps[][] {
-    return range(0, 20)
-        .map(i => range(0, 20)
-            .map(j => ({
-                stuff: 10,
-                id: `${i}_${j}`,
-            } as IBlockProps)));
-}
-
-function decrementBlock(block: IBlockProps) {
-
-    return block.stuff === 0 ? block : {
-        ...block,
-        stuff: block.stuff - 1,
-    };
-}
-
 export function Game(): JSX.Element {
-    const [blocks, setBlocks] = useState<IBlockProps[][]>(createInitialBlockProps());
+    const blocks = useSelector<IGameState, IBlocks>(state => state.blocks);
+    const dispatch = useDispatch();
 
-    const onBlockClick = useCallback((id: string, block: IBlockProps) => {
-        const blockSpots = id.split('_').map(n => parseInt(n));
-        const [blockI, blockJ] = blockSpots;
-        console.log(block);
-        setBlocks([
-            ...blocks.map((row, i) => i === blockI
-                ? [
-                    ...row.slice(0, blockJ),
-                    decrementBlock(block),
-                    ...row.slice(blockJ + 1)
-                ]
-                : row)
-        ])
+    const onBlockClick = useCallback((block: IBlock) => {
+        console.log('clicked block', block);
+        dispatch({ type: 'DECREMENT', payload: block });
     }, [blocks]);
 
     return (
         <div className={styles.root}>
             Game root
-            {blocks.map(row => (
+            {blocks.map(col => (
                 <div className={styles.row}>
-                    {row.map(cell => (
-                        <Block id={cell.id} stuff={cell.stuff} onClick={() => onBlockClick(cell.id, cell)} />
+                    {col.map(block => (
+                        <Block block={block} onClick={() => onBlockClick(block)} />
                     ))}
                 </div>
             ))}
         </div>
-    )
+    );
 }
 
-function Block({ stuff, onClick }: IBlockProps): JSX.Element {
+function Block({ block: { stuff }, onClick }: IBlockProps): JSX.Element {
     const size = useMemo(() => Math.floor(stuff * 100 / 10) + '%', [stuff]);
     return (
         <div className={styles.block} onClick={onClick}>
@@ -67,5 +41,5 @@ function Block({ stuff, onClick }: IBlockProps): JSX.Element {
                 style={{ height: size, width: size }}
             />
         </div>
-    )
+    );
 }

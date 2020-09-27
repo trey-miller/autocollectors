@@ -1,6 +1,8 @@
 .root {
 	border: 1px solid darkred;
 	margin: 5px;
+	display:flex;
+	flex-direction: column;
 }
 
 .block {
@@ -10,8 +12,8 @@
 	display: inline-block;
 	background-color: white;
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 	.blockColor {
 		background-color: #222;
 		width: 100%;
