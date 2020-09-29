@@ -1,30 +1,36 @@
 import { Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import { IBlock, IGameState } from './State';
+import { IGameState, IPosition } from './State';
 
 
-export interface IAction<TType = string, TPayload = undefined> extends Action<TType> {
-    type: TType;
-    payload: TPayload;
-}
+export type GameAction<TType = string, TPayload = undefined> = TPayload extends undefined
+    ? Action<TType>
+    : { type: TType; payload: TPayload; };
 
 export const COLLECT = 'COLLECT';
-export type CollectAction = IAction<typeof COLLECT, IBlock>;
+export type CollectAction = GameAction<typeof COLLECT, IPosition>;
+
+export const RESET_GAME = 'RESET_GAME';
+export type ResetGameAction = GameAction<typeof RESET_GAME>;
 
 export type ActionUnion = (
     | CollectAction
+    | ResetGameAction
 );
 
 export type GameThunkAction = ThunkAction<unknown, IGameState, unknown, ActionUnion>;
 
-export const collect = (block: IBlock): CollectAction => ({
+export const collect = (block: IPosition): CollectAction => ({
     type: COLLECT,
     payload: block,
 });
 
 export const collectRandom = (): GameThunkAction => (dispatch, getState) => {
-    const blocks = getState().blocks;
-    const y = Math.floor(Math.random() * blocks.length);
-    const x = Math.floor(Math.random() * blocks[y].length);
-    dispatch(collect(blocks[y][x]));
+    const collectibleBlocks = getState().collectibleBlocks;
+    if (collectibleBlocks.length > 0) {
+        const randomBlock = collectibleBlocks[Math.floor(Math.random() * collectibleBlocks.length)];
+        dispatch(collect(randomBlock));
+    }
 };
+
+export const resetGame = (): ResetGameAction => ({ type: RESET_GAME });

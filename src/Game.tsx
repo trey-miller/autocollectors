@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import styles from './Game.module.scss';
-import { IBlock, IBlocks, IGameState } from './game/State';
+import { IBlock, IBlocks, IGameState, IPosition } from './game/State';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStep } from './game/hooks/useStep';
-import { collect, collectRandom } from './game/Actions';
+import { collect, collectRandom, resetGame } from './game/Actions';
 import { createKey } from './game/util';
 
 
@@ -14,7 +14,9 @@ interface IBlockProps {
 export function Game(): JSX.Element {
     const blocks = useSelector<IGameState, IBlocks>(state => state.blocks);
     const stuff = useSelector<IGameState, number>(state => state.stuff);
+    const collectibleBlocks = useSelector<IGameState, IPosition[]>(state => state.collectibleBlocks);
     const dispatch = useDispatch();
+    const onResetClick = useCallback(() => dispatch(resetGame()), [dispatch]);
 
     useStep(delta => {
         dispatch(collectRandom());
@@ -22,7 +24,13 @@ export function Game(): JSX.Element {
 
     return (
         <div className={styles.root}>
+            <button onClick={onResetClick}>RESET</button>
             <p>Collected stuff: {stuff}</p>
+            {collectibleBlocks.length === 0 && (
+                <p className={styles.success}>
+                    All stuff collected!
+                </p>
+            )}
             <div>
                 {blocks.map((row, i) => (
                     <div className={styles.row} key={i}>
@@ -41,7 +49,7 @@ export function Game(): JSX.Element {
 
 function Block({ block }: IBlockProps): JSX.Element {
     const dispatch = useDispatch();
-    const onClick = useCallback(() => dispatch(collect(block)), [dispatch, block]);
+    const onClick = useCallback(() => block.stuff > 0 && dispatch(collect(block)), [dispatch, block]);
     const size = useMemo(() => Math.floor(block.stuff * 100 / 10) + '%', [block.stuff]);
     return (
         <div className={styles.block} onClick={onClick}>

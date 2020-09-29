@@ -1,5 +1,6 @@
-import { ActionUnion, COLLECT } from './Actions';
+import { ActionUnion, COLLECT, RESET_GAME } from './Actions';
 import { createDefaultState, IGameState } from './State';
+import { set2dValue } from './util';
 
 
 export function rootReducer(state: IGameState = createDefaultState(), action?: ActionUnion): IGameState {
@@ -14,19 +15,18 @@ export function rootReducer(state: IGameState = createDefaultState(), action?: A
             if (block.stuff <= 0) {
                 return state;
             }
+            const newBlock = { ...block, stuff: block.stuff - 1 };
+            const isDepleted = newBlock.stuff <= 0;
             return {
                 ...state,
-                blocks: [
-                    ...state.blocks.map((column, y) => y === block.y
-                        ? [
-                            ...column.slice(0, block.x),
-                            { ...block, stuff: block.stuff - 1 },
-                            ...column.slice(block.x + 1),
-                        ]
-                        : column),
-                ],
+                blocks: set2dValue(state.blocks, y, x, newBlock),
+                collectibleBlocks: isDepleted
+                    ? state.collectibleBlocks.filter(b => b.x !== x || b.y !== y)
+                    : state.collectibleBlocks,
                 stuff: state.stuff + 1,
             };
+        case RESET_GAME:
+            return createDefaultState();
         default:
             return state;
     }
