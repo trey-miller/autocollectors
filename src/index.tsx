@@ -6,7 +6,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import { applyMiddleware, compose, createStore } from 'redux';
-import { rootReducer } from './game/Reducers';
+import { rootReducer } from './game/reducers';
 import { IGameState } from './game/State';
 import { ActionUnion } from './game/Actions';
 

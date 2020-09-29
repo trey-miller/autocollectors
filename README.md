@@ -1,8 +1,14 @@
+# Auto Collectors
+
+This is just some random experimentation using react/redux. It's sort of like an incremental game that does nothing but collect stuff from blocks in a grid. 
+
+# Development
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory, you can run (I switched it from `yarn` to `npm`):
 
 ### `npm start`
 

@@ -10,20 +10,27 @@ export type GameAction<TType = string, TPayload = undefined> = TPayload extends 
 export const COLLECT = 'COLLECT';
 export type CollectAction = GameAction<typeof COLLECT, IPosition>;
 
+export const SEARCH = 'SEARCH';
+export type SearchAction = GameAction<typeof SEARCH, IPosition>;
+
 export const RESET_GAME = 'RESET_GAME';
-export type ResetGameAction = GameAction<typeof RESET_GAME>;
+export type ResetGameAction = GameAction<typeof RESET_GAME, { size: number }>;
 
 export type ActionUnion = (
     | CollectAction
+    | SearchAction
     | ResetGameAction
 );
 
 export type GameThunkAction = ThunkAction<unknown, IGameState, unknown, ActionUnion>;
 
-export const collect = (block: IPosition): CollectAction => ({
-    type: COLLECT,
-    payload: block,
-});
+export const collect = (pos: IPosition): GameThunkAction => (dispatch, getState) => {
+    dispatch({ type: COLLECT, payload: pos });
+    const collectedBlock = getState().blocks[pos.y][pos.x];
+    if (collectedBlock.stuff === 0) {
+        dispatch({ type: SEARCH, payload: collectedBlock });
+    }
+};
 
 export const collectRandom = (): GameThunkAction => (dispatch, getState) => {
     const collectibleBlocks = getState().collectibleBlocks;
@@ -33,4 +40,4 @@ export const collectRandom = (): GameThunkAction => (dispatch, getState) => {
     }
 };
 
-export const resetGame = (): ResetGameAction => ({ type: RESET_GAME });
+export const resetGame = (size: number): ResetGameAction => ({ type: RESET_GAME, payload: { size } });
