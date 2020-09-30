@@ -36,5 +36,5 @@ export const createState = (width: number, height: number): IGameState => {
     };
 };
 
-const SIZE = 3;
+const SIZE = 20;
 export const createDefaultState = () => createState(SIZE, SIZE);
