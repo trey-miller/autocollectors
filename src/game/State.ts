@@ -21,8 +21,8 @@ export interface IGameState {
 
 
 export const createState = (width: number, height: number): IGameState => {
-    const blocks = range(0, height)
-        .map(y => range(0, width)
+    const blocks = range(height)
+        .map(y => range(width)
             .map(x => ({
                 x,
                 y,

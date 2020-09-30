@@ -9,7 +9,7 @@ describe('Collect action works', () => {
     test('Proper block\'s stuff is decremented.', () => {
         const state = createState(10, 10);
         const newState = rootReducer(state, mockCollect(state.blocks[1][2]));
-        expect(newState.blocks[1][2]).toEqual({ x: 2, y: 1, stuff: 9, reachable: false });
+        expect(newState.blocks[1][2]).toEqual({ x: 2, y: 1, stuff: 9, reachable: true });
     });
     test('Block stuff does not go below zero', () => {
         const x = 5;

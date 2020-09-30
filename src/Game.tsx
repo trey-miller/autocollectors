@@ -18,7 +18,7 @@ export function Game(): JSX.Element {
             </div>
             <StuffDisplay />
             <div>
-                {range(0, blockRowCount).map(y => (
+                {range(blockRowCount).map(y => (
                     <BlockRow key={y} y={y} />
                 ))}
             </div>
@@ -83,7 +83,7 @@ function BlockRow({ y }: { y: number }): JSX.Element {
     const rowSize = useSelector<IGameState, number>(state => state.blocks[y].length);
     return (
         <div className={styles.row}>
-            {range(0, rowSize).map(x => (
+            {range(rowSize).map(x => (
                 <Block key={x} x={x} y={y} />
             ))}
         </div>
