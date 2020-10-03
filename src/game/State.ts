@@ -1,4 +1,7 @@
 import { range } from 'lodash';
+import { TypedUseSelectorHook, useSelector } from 'react-redux';
+
+export const useGameSelector: TypedUseSelectorHook<IGameState> = useSelector;
 
 export interface IPosition {
     x: number;
@@ -17,6 +20,7 @@ export interface IGameState {
     blocks: IBlock[][];
     collectibleBlocks: IPosition[];
     stuff: number;
+    speed: number;
 }
 
 
@@ -33,6 +37,7 @@ export const createState = (width: number, height: number): IGameState => {
         blocks,
         collectibleBlocks: [{ x: 0, y: 0 }],
         stuff: 0,
+        speed: 1,
     };
 };
 

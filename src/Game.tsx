@@ -1,23 +1,23 @@
-import React, { ChangeEventHandler, useCallback, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { range } from 'lodash';
 import styles from './Game.module.scss';
-import { IBlock, IGameState, IPosition } from './game/State';
-import { parseIntWithDefault } from './game/util';
+import { IPosition, useGameSelector } from './game/State';
 import { useStep } from './game/hooks/useStep';
-import { collect, collectRandom, resetGame } from './game/Actions';
+import { collect, collectRandom, resetGame, setSpeed } from './game/Actions';
 
 
 export function Game(): JSX.Element {
-    const blockRowCount = useSelector<IGameState, number>(state => state.blocks.length);
+    const blockRowCount = useGameSelector(state => state.blocks.length);
     return (
         <div className={styles.root}>
+            <GameLoop />
             <div className={styles.controls}>
                 <Resetter defaultGridSize={blockRowCount} />
-                <SpeedSelectorGameLoop />
+                <SpeedSelector />
             </div>
             <StuffDisplay />
-            <div>
+            <div className={styles.grid}>
                 {range(blockRowCount).map(y => (
                     <BlockRow key={y} y={y} />
                 ))}
@@ -27,50 +27,61 @@ export function Game(): JSX.Element {
     );
 }
 
+function GameLoop(): null {
+    const dispatch = useDispatch();
+    const speed = useGameSelector(state => state.speed);
+    const stepMs = useMemo(() => 1000 / speed, [speed]);
+    useStep(() => dispatch(collectRandom()), stepMs);
+    return null;
+}
+
 function Resetter({ defaultGridSize }: { defaultGridSize: number }): JSX.Element {
     const dispatch = useDispatch();
-
     const [resetSize, setResetSize] = useState(defaultGridSize);
-    const onResetSizeChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
-        e => setResetSize(parseIntWithDefault(e.target.value, resetSize)), [resetSize]);
-
-    const onResetClick = useCallback(() => dispatch(resetGame(resetSize)), [dispatch, resetSize]);
+    const [disabled, setDisabled] = useState(false);
+    const onChange = useCallback(({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+        const n = parseInt(value, 10);
+        if (n > 0) {
+            setResetSize(n);
+        }
+        setDisabled(isNaN(n) || n < 1);
+    }, []);
+    const onResetClick = useCallback(() => !disabled && dispatch(resetGame(resetSize)), [dispatch, disabled, resetSize]);
     return (
         <p>
             <span>Size</span>
-            <input type="number" min={1} value={resetSize} onChange={onResetSizeChange} />
-            <button onClick={onResetClick}>Reset</button>
+            <input type="number" min={1} defaultValue={String(defaultGridSize)} onChange={onChange} required pattern="[1-9][0-9]*" />
+            <button disabled={disabled} onClick={onResetClick}>Reset</button>
         </p>
     );
 }
 
-function SpeedSelectorGameLoop(): JSX.Element {
-    // TODO split out game loop from the speed selector, while moving speed to the store.
+function SpeedSelector(): JSX.Element {
     const dispatch = useDispatch();
-    const [speed, setSpeed] = useState(1);
-    const onSpeedChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
-        e => setSpeed(parseIntWithDefault(e.target.value, speed)), [speed]);
-
-    const stepMs = useMemo(() => 1000 / speed, [speed]);
-    useStep(() => dispatch(collectRandom()), stepMs);
+    const speed = useGameSelector(state => state.speed);
+    const onChange = useCallback(({ target: { valueAsNumber } }: React.ChangeEvent<HTMLInputElement>) => {
+        if (valueAsNumber > 0) {
+            dispatch(setSpeed(valueAsNumber));
+        }
+    }, [dispatch]);
     return (
         <p>
             <span>Speed</span>
-            <input type="number" min={1} value={speed} onChange={onSpeedChange} />
+            <input type="number" min={1} defaultValue={String(speed)} onChange={onChange} required pattern="[1-9][0-9]*" />
             <span>&nbsp;ticks/sec</span>
         </p>
     );
 }
 
 function StuffDisplay(): JSX.Element {
-    const stuff = useSelector<IGameState, number>(state => state.stuff);
+    const stuff = useGameSelector(state => state.stuff);
     return (
         <p>Collected stuff: <strong>{stuff}</strong></p>
     );
 }
 
 function SuccessDisplay(): JSX.Element | null {
-    const isDone = useSelector<IGameState, boolean>(state => state.collectibleBlocks.length === 0);
+    const isDone = useGameSelector(state => state.collectibleBlocks.length === 0);
     if (isDone) {
         return (
             <p className={styles.success}>All stuff collected!</p>
@@ -80,7 +91,7 @@ function SuccessDisplay(): JSX.Element | null {
 }
 
 function BlockRow({ y }: { y: number }): JSX.Element {
-    const rowSize = useSelector<IGameState, number>(state => state.blocks[y].length);
+    const rowSize = useGameSelector(state => state.blocks[y].length);
     return (
         <div className={styles.row}>
             {range(rowSize).map(x => (
@@ -91,7 +102,7 @@ function BlockRow({ y }: { y: number }): JSX.Element {
 }
 
 function Block({ x, y }: IPosition): JSX.Element {
-    const block = useSelector<IGameState, IBlock>(state => state.blocks[y][x]);
+    const block = useGameSelector(state => state.blocks[y][x]);
     const dispatch = useDispatch();
     const onClick = useCallback(() => block.stuff > 0 && dispatch(collect(block)), [dispatch, block]);
     const size = useMemo(() => Math.floor(block.stuff * 100 / 10) + '%', [block.stuff]);

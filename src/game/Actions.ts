@@ -16,10 +16,14 @@ export type SearchAction = GameAction<typeof SEARCH, IPosition>;
 export const RESET_GAME = 'RESET_GAME';
 export type ResetGameAction = GameAction<typeof RESET_GAME, { size: number }>;
 
+export const SET_SPEED = 'SET_SPEED';
+export type SetSpeedAction = GameAction<typeof SET_SPEED, number>;
+
 export type ActionUnion = (
     | CollectAction
     | SearchAction
     | ResetGameAction
+    | SetSpeedAction
 );
 
 export type GameThunkAction = ThunkAction<unknown, IGameState, unknown, ActionUnion>;
@@ -41,3 +45,5 @@ export const collectRandom = (): GameThunkAction => (dispatch, getState) => {
 };
 
 export const resetGame = (size: number): ResetGameAction => ({ type: RESET_GAME, payload: { size } });
+
+export const setSpeed = (speed: number): SetSpeedAction => ({ type: SET_SPEED, payload: speed });
