@@ -15,12 +15,18 @@ export interface IBlock extends IPosition {
 
 export type IBlocks = IBlock[][];
 
+export enum GridType {
+    Canvas = 'Canvas',
+    Dom = 'Dom',
+}
+
 export interface IGameState {
     /** Access y first, so block at (2,3) is blocks[3][2] */
     blocks: IBlock[][];
     collectibleBlocks: IPosition[];
     stuff: number;
     speed: number;
+    gridType: GridType;
 }
 
 
@@ -38,6 +44,7 @@ export const createState = (width: number, height: number): IGameState => {
         collectibleBlocks: [{ x: 0, y: 0 }],
         stuff: 0,
         speed: 1,
+        gridType: GridType.Canvas,
     };
 };
 

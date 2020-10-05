@@ -1,28 +1,29 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { range } from 'lodash';
 import styles from './Game.module.scss';
-import { IPosition, useGameSelector } from './game/State';
+import { GridType, useGameSelector } from './game/State';
 import { useStep } from './game/hooks/useStep';
-import { collect, collectRandom, resetGame, setSpeed } from './game/Actions';
+import { collectRandom, resetGame, setGridType, setSpeed } from './game/Actions';
+import { CanvasGrid } from './game/CanvasGrid';
+import { DomGrid } from './game/DomGrid';
 
 
 export function Game(): JSX.Element {
-    const blockRowCount = useGameSelector(state => state.blocks.length);
+    const gridType = useGameSelector(s => s.gridType);
     return (
         <div className={styles.root}>
             <GameLoop />
             <div className={styles.controls}>
-                <Resetter defaultGridSize={blockRowCount} />
+                <Resetter />
                 <SpeedSelector />
+                <GridTypeSelector />
             </div>
             <StuffDisplay />
-            <div className={styles.grid}>
-                {range(blockRowCount).map(y => (
-                    <BlockRow key={y} y={y} />
-                ))}
-            </div>
             <SuccessDisplay />
+            {gridType === GridType.Canvas
+                ? <CanvasGrid />
+                : <DomGrid />
+            }
         </div>
     );
 }
@@ -35,7 +36,8 @@ function GameLoop(): null {
     return null;
 }
 
-function Resetter({ defaultGridSize }: { defaultGridSize: number }): JSX.Element {
+function Resetter(): JSX.Element {
+    const defaultGridSize = useGameSelector(state => state.blocks.length, () => false);
     const dispatch = useDispatch();
     const [resetSize, setResetSize] = useState(defaultGridSize);
     const [disabled, setDisabled] = useState(false);
@@ -46,11 +48,13 @@ function Resetter({ defaultGridSize }: { defaultGridSize: number }): JSX.Element
         }
         setDisabled(isNaN(n) || n < 1);
     }, []);
-    const onResetClick = useCallback(() => !disabled && dispatch(resetGame(resetSize)), [dispatch, disabled, resetSize]);
+    const onResetClick = useCallback(
+        () => !disabled && dispatch(resetGame(resetSize)),
+        [dispatch, disabled, resetSize]);
     return (
         <p>
             <span>Size</span>
-            <input type="number" min={1} defaultValue={String(defaultGridSize)} onChange={onChange} required pattern="[1-9][0-9]*" />
+            <input type="number" min={1} defaultValue={String(resetSize)} onChange={onChange} required pattern="[1-9][0-9]*" />
             <button disabled={disabled} onClick={onResetClick}>Reset</button>
         </p>
     );
@@ -73,6 +77,41 @@ function SpeedSelector(): JSX.Element {
     );
 }
 
+function GridTypeSelector(): JSX.Element {
+    const gridType = useGameSelector(s => s.gridType);
+    const dispatch = useDispatch();
+
+    const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch(setGridType(e.target.value as GridType));
+    }, [dispatch]);
+
+    return (
+        <p>
+            <span>Grid Render Type</span>
+            <label>
+                <input
+                    type="radio"
+                    name="grid-type"
+                    value={GridType.Canvas}
+                    checked={gridType === GridType.Canvas}
+                    onChange={onChange}
+                />
+                Canvas
+            </label>
+            <label>
+                <input
+                    type="radio"
+                    name="grid-type"
+                    value={GridType.Dom}
+                    checked={gridType === GridType.Dom}
+                    onChange={onChange}
+                />
+                Dom
+            </label>
+        </p>
+    );
+}
+
 function StuffDisplay(): JSX.Element {
     const stuff = useGameSelector(state => state.stuff);
     return (
@@ -88,31 +127,4 @@ function SuccessDisplay(): JSX.Element | null {
         );
     }
     return null;
-}
-
-function BlockRow({ y }: { y: number }): JSX.Element {
-    const rowSize = useGameSelector(state => state.blocks[y].length);
-    return (
-        <div className={styles.row}>
-            {range(rowSize).map(x => (
-                <Block key={x} x={x} y={y} />
-            ))}
-        </div>
-    );
-}
-
-function Block({ x, y }: IPosition): JSX.Element {
-    const block = useGameSelector(state => state.blocks[y][x]);
-    const dispatch = useDispatch();
-    const onClick = useCallback(() => block.stuff > 0 && dispatch(collect(block)), [dispatch, block]);
-    const size = useMemo(() => Math.floor(block.stuff * 100 / 10) + '%', [block.stuff]);
-
-    return (
-        <div className={`${styles.block} ${block.reachable ? styles.reachable : ''}`} onClick={onClick}>
-            <div
-                className={styles.blockColor}
-                style={{ height: size, width: size }}
-            />
-        </div>
-    );
 }
