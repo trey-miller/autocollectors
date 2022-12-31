@@ -4,11 +4,6 @@
     "jsRules": {},
     "rules": {
         "no-angle-bracket-type-assertion": true,
-        "quotemark": [
-            true,
-            "single",
-            "jsx-double"
-        ],
         "semicolon": [
             true,
             "always"

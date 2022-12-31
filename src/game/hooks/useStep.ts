@@ -1,12 +1,10 @@
-import { useMemo, useRef } from 'react';
-import { useRafLoop } from 'react-use';
-
+import { useRef } from "react";
+import { useRafLoop } from "react-use";
 
 /** updates as close to every stepMs as possible, while hopefully preventing drift over time. */
-export function useStep(update: (delta: number) => void, stepMs: number = (1 / 30)): void {
+export function useStep(update: (delta: number) => void, stepMs: number = 1 / 30): void {
     const lastTimeRef = useRef(0);
     const accumRef = useRef(0);
-    const maxAccum = useMemo(() => stepMs * 10, [stepMs]);
 
     useRafLoop(time => {
         if (lastTimeRef.current === 0) {
@@ -15,12 +13,12 @@ export function useStep(update: (delta: number) => void, stepMs: number = (1 / 3
         const delta = time - lastTimeRef.current;
         lastTimeRef.current = time;
         accumRef.current += delta;
-        if (accumRef.current > maxAccum) {
-            accumRef.current = maxAccum;
-        }
-        while (accumRef.current >= stepMs) {
+        let updatesLeft = 10; // cap updates in this step to a reasonable maximum, without losing the accum
+
+        while (accumRef.current >= stepMs && updatesLeft > 0) {
             update(stepMs);
             accumRef.current -= stepMs;
+            updatesLeft--;
         }
     });
 }

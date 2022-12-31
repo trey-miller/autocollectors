@@ -1,7 +1,7 @@
-import { ActionUnion, COLLECT, RESET_GAME, SEARCH, SET_GRID_TYPE, SET_SPEED } from '../Actions';
-import { collectReducer } from './collect';
-import { searchReducer } from './search';
-import { createDefaultState, createState, IGameState } from '../State';
+import { ActionUnion, COLLECT, RESET_GAME, SEARCH, SET_GRID_TYPE, SET_SELECTED_POSITION, SET_SPEED } from "../Actions";
+import { collectReducer } from "./collect";
+import { searchReducer } from "./search";
+import { createDefaultState, createState, IGameState } from "../State";
 
 export function rootReducer(state: IGameState = createDefaultState(), action?: ActionUnion): IGameState {
     if (!action) {
@@ -29,6 +29,11 @@ export function rootReducer(state: IGameState = createDefaultState(), action?: A
             return {
                 ...state,
                 gridType: action.payload,
+            };
+        case SET_SELECTED_POSITION:
+            return {
+                ...state,
+                selectedPosition: action.payload,
             };
         default:
             return state;
