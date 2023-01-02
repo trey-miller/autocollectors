@@ -1,102 +1,115 @@
 .root {
-	align-items: center;
-	border: 5px ridge #421;
-	color: #eee;
-	display: flex;
-	flex-direction: column;
-	margin: 5px;
-	padding: 10px;
+    align-items: center;
+    border: 5px ridge #421;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    padding: 10px;
 }
 
 .controls {
-	p {
-		align-items: center;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		margin: 10px 0;
-	}
-	input {
-		border-radius: 3px;
-		height: 28px;
-		line-height: 28px;
-		margin-left: 5px;
-		padding: 0 5px;
-		vertical-align: middle;
+    p {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 10px 0;
+    }
+    input {
+        border-radius: 3px;
+        height: 28px;
+        line-height: 28px;
+        margin-left: 5px;
+        padding: 0 5px;
+        vertical-align: middle;
 
-		&[type=number] {
-			width: 60px;
-		}
-		&:invalid {
-			background-color: #f99;
-		}
-	}
-	label {
-		align-items: center;
-		display: flex;
-		height: 28px;
-		margin-left: 5px;
-	}
-	button {
-		border-radius: 3px;
-		height: 28px;
-		vertical-align: middle;
-	}
+        &[type="number"] {
+            width: 60px;
+        }
+        &:invalid {
+            background-color: #f99;
+        }
+    }
+    label {
+        align-items: center;
+        display: flex;
+        height: 28px;
+        margin-left: 5px;
+    }
+    button {
+        border-radius: 3px;
+        height: 28px;
+        vertical-align: middle;
+    }
 }
 
 .grid {
-	width: 100%;
-	max-width: 60vh;
+    width: 100%;
+    max-width: 60vh;
 }
 .row {
-	display: flex;
+    display: flex;
 }
 .block {
-	align-items: center;
-	background-color: white;
-	border: 1px solid #111;
-	display: flex;
-	justify-content: center;
-	width: 100vw;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #111;
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    position: relative;
 
-	&:before {
-		// maintain aspect ratio on flex-shrink
-		content: ' ';
-		display: block;
-		padding-top: 100%;
-	}
+    &:before {
+        // maintain aspect ratio on flex-shrink
+        content: " ";
+        display: block;
+        padding-top: 100%;
+    }
 
-	.blockColor {
-		background-color: #222;
-		height: 100%;
-		width: 100%;
-	}
+    .blockColor {
+        background-color: #222;
+        height: 100%;
+        width: 100%;
+    }
+    .blockNumber {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        font-size: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+        vertical-align: middle;
+        line-height: 1.5;
+        text-shadow: 0 0 2px black;
+    }
 
-	&.reachable .blockColor {
-		background-color: #421;
-	}
+    &.reachable .blockColor {
+        background-color: #421;
+    }
 }
 .success {
-	color: #3f1;
-	font-size: 1.2em;
-	margin-top: 0;
+    color: #3f1;
+    font-size: 1.2em;
+    margin-top: 0;
 }
 
 .gridCanvasContainer {
-	flex: 0 0 0;
-	width: 100%;
-	max-width: 60vh;
-	&:before {
-		content: ' ';
-		display: block;
-		padding-top: 100%;
-	}
-	position: relative;
+    flex: 0 0 0;
+    width: 100%;
+    max-width: 60vh;
+    &:before {
+        content: " ";
+        display: block;
+        padding-top: 100%;
+    }
+    position: relative;
 }
 .gridCanvas {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	left: 0;
-	top: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
 }

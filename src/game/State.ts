@@ -9,6 +9,8 @@ export interface IPosition {
 }
 
 export interface IBlock extends IPosition {
+    /** log2 of the starting stuff; level 1 starts with 2^1=2 stuff, level 5 start swith 2^5=32 stuff */
+    level: number;
     stuff: number;
     reachable: boolean;
 }
@@ -32,12 +34,16 @@ export interface IGameState {
 
 export const createState = (width: number, height: number): IGameState => {
     const blocks = range(height).map(y =>
-        range(width).map(x => ({
-            x,
-            y,
-            stuff: 10,
-            reachable: y === 0 && x === 0,
-        })),
+        range(width).map(x => {
+            const level = Math.round((10 * (x + y)) / (width + height));
+            return {
+                x,
+                y,
+                level,
+                stuff: 2 ** level,
+                reachable: y === 0 && x === 0,
+            };
+        }),
     );
     return {
         blocks,

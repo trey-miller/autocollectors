@@ -33,11 +33,13 @@ function Block({ x, y }: IPosition): JSX.Element {
     const block = useGameSelector(state => state.blocks[y][x]);
     const dispatch = useDispatch();
     const onClick = useCallback(() => block.stuff > 0 && dispatch(setSelectedPosition(block)), [dispatch, block]);
-    const size = useMemo(() => Math.floor((block.stuff * 100) / 10) + "%", [block.stuff]);
+    const maxStuff = 2 ** block.level;
+    const size = useMemo(() => Math.floor((block.stuff * 100) / maxStuff) + "%", [block.stuff, maxStuff]);
 
     return (
         <div className={`${styles.block} ${block.reachable ? styles.reachable : ""}`} onClick={onClick}>
-            <div className={styles.blockColor} style={{ height: size, width: size }} />
+            <div className={styles.blockColor} style={{ height: size, width: size }}></div>
+            {block.stuff > 0 && <div className={styles.blockNumber}>{block.level}</div>}
         </div>
     );
 }

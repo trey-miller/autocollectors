@@ -32,6 +32,9 @@ export function CanvasGrid(): JSX.Element {
             return;
         }
 
+        ctx.font = "14px Arial, Helvetica, sans-serif";
+        ctx.textAlign = "center";
+
         ctx.clearRect(0, 0, ref.current.width, ref.current.height);
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, ref.current.width, ref.current.height);
@@ -48,7 +51,8 @@ export function CanvasGrid(): JSX.Element {
                 const x = i * blockHeight;
 
                 if (block.stuff > 0) {
-                    const stuffRatio = block.stuff / 10;
+                    const maxStuff = 2 ** block.level;
+                    const stuffRatio = block.stuff / maxStuff;
                     const drawWidth = stuffRatio * blockWidth;
                     const drawHeight = stuffRatio * blockHeight;
                     const drawX = x + (blockWidth - drawWidth) / 2;
@@ -56,9 +60,24 @@ export function CanvasGrid(): JSX.Element {
 
                     ctx.fillStyle = block.reachable ? "#421" : "#222";
                     ctx.fillRect(drawX, drawY, drawWidth, drawHeight);
+
+                    ctx.fillStyle = "white";
+                    ctx.fillText(
+                        String(block.level),
+                        x + blockWidth / 2,
+                        y + blockHeight - (blockHeight - 9) / 2,
+                        blockWidth,
+                    );
+                    ctx.strokeStyle = "#999";
+                    ctx.strokeText(
+                        String(block.level),
+                        x + blockWidth / 2,
+                        y + blockHeight - (blockHeight - 9) / 2,
+                        blockWidth,
+                    );
                 }
 
-                ctx.fillStyle = "black";
+                ctx.strokeStyle = "black";
                 ctx.lineWidth = 1;
                 ctx.strokeRect(x, y, blockWidth, blockHeight);
             }
